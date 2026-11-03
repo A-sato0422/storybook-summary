@@ -1,0 +1,47 @@
+﻿2. 導入手順
+既存の React ＋ Vite プロジェクトに導入する場合の手順
+
+前提条件（公式のプロジェクト要件より抜粋）
+#	項目	要件	備考
+1	Node.js	20以上	npm 10以上（pnpm 9+ / Yarn 4+ も可）
+2	Vite	5以上
+3	TypeScript	4.9以上
+4	ブラウザ	モダンブラウザ	古いブラウザは「preview-only」モードで対応
+
+A. インストール（この2ステップで画面表示まで完了）
+Step	作業	コマンド	補足
+A-1	Storybookのインストール	npm create storybook@latest	"プロジェクトルートで実行。React＋Vite構成を自動判別し、必要なパッケージと設定を追加する。
+設定種別は「Recommended（ドキュメント・テスト込み）」を選択。
+
+【追加されるもの】
+・.storybook/main.ts（全体設定）
+・.storybook/preview.ts（表示設定）
+・src/stories/（サンプルのStory。確認後は削除可）
+・package.json に storybook / build-storybook スクリプト"
+A-2	起動	npm run storybook	http://localhost:6006 でStorybookの画面が開く。
+
+B. 導入後の整備（内部設計書として使える状態にするための作業）
+Step	作業	コマンド／設定例	補足
+B-1	Autodocsを全体で有効化	"// .storybook/preview.ts
+const preview: Preview = {
+  tags: ['autodocs'],
+};"	"全コンポーネントにDocsページを自動生成する。
+個別に有効化する場合は各 stories の meta に tags: ['autodocs']。"
+B-2	型抽出の設定（任意）	"// .storybook/main.ts
+typescript: {
+  reactDocgen: 'react-docgen-typescript',
+},"	他ファイルから import した型も正確にProps表へ出したい場合に切替（ビルドはやや遅くなる）。
+B-3	JSDocコメントの整備	"/** 送信ボタン。二重送信を防止する */
+export const SubmitButton = ...
+
+/** ボタンの表示文言 */
+label: string;"	コンポーネント・Propsに付けたコメントがDocsページの説明欄になる。設計書の品質はここで決まる。
+B-4	コンポーネントのStory作成	"// Button.stories.tsx
+const meta = { component: Button } satisfies Meta<typeof Button>;
+export const Primary: Story = { args: { label: '送信' } };"	"Storyを書いたコンポーネントだけがドキュメント化される（コンポーネント数×状態数）。
+Storybook 10.4以降のAI自動セットアップ／MCPで作成を補助できる。"
+B-5	ページのStory作成	"decorators で Router・Store・ThemeProvider をラップ
+APIは MSW（msw-storybook-addon）でモック"	ページは依存が多く、モックの準備が必要。
+B-6	静的ビルド	npm run build-storybook	storybook-static/ にHTML一式が出力される。
+B-7	共有・自動更新	"社内サーバ／S3／GitHub Pages／Chromatic 等へ配置
+CIで main マージ時に自動ビルド"	実装と常に同期したドキュメントにできる点が最大の利点。

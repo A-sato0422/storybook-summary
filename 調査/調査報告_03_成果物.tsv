@@ -1,0 +1,28 @@
+﻿3. Storybookで生成できる内部設計書のアウトプット
+
+成果物一覧
+#	成果物	内容	形式	設計書での位置づけ
+1	Storybook静的サイト	下記2〜5をまとめたWebサイト一式（storybook build の出力）。	HTML	閲覧用の設計資料（Web）
+2	サイドバー（ツリー）	Story化したコンポーネント・ページの階層一覧。	HTML	コンポーネント一覧／（Story化した）画面一覧
+3	Docsページ（コンポーネント毎）	タイトル・説明（JSDoc）、代表Story、Props表、全Story一覧、「Show code」での使用例コード。	HTML	コンポーネント仕様書
+4	Props表（ArgTypes）	Props名／説明／型／既定値／必須可否／Control。	HTML	I/F定義
+5	MDXドキュメント	手書きの説明ページ（画面説明・設計方針・遷移図など）にStoryを埋め込んだもの。	HTML	任意の補足章（手作業）
+※ 各成果物の画面イメージは「03-1_図解_成果物一覧」シートを参照。番号は上表の # と対応。
+Docsページの構成イメージ（例：SubmitButton）
+#	表示ブロック	表示される内容（例）	自動/手動	元データ
+1	Title	SubmitButton	自動	ファイル・コンポーネント名
+2	Description	送信ボタン。二重送信を防止する。	自動	コンポーネントのJSDoc
+3	Primary（代表Story）	実際にレンダリングされたボタン	自動	最初のStory
+4	Controls / Props表	"label | ボタンの表示文言 | string | — | 必須
+disabled | 非活性 | boolean | false
+onClick | クリック時処理 | () => void | —"	自動	TypeScript型＋PropsのJSDoc
+5	Stories	Primary / Disabled / Loading の各状態	自動（Story作成は手動）	*.stories.tsx
+6	Show code	"<SubmitButton label=""送信"" disabled={false} />"	自動	Storyのargs
+
+設計書として見た場合の評価
+#	観点	評価
+1	実装との同期	◎ ソース（型・コメント）から生成するため、CIに組み込めば常に最新。
+2	UI仕様の網羅性	○ Props・見た目・状態バリエーションは分かりやすい。
+3	処理内容の記述	× コンポーネント内部の処理やService層は記述されない。
+4	納品物としての形式	× Web形式のみ。Excel設計書が必要な場合は別途作成が必要。
+5	作成コスト	△ Story・JSDocを書く前提。既存規模によっては工数大。

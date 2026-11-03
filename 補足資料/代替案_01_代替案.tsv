@@ -1,0 +1,29 @@
+﻿Storybookでできないことに対する代替ツール・代替案
+
+代替ツール一覧
+#	不足項目	ツール／手段	概要	出力形式	導入・実行例	長所	短所
+1	Service/Utilのクラス・メソッド一覧、メソッド詳細	TypeDoc（＋typedoc-plugin-markdown）	TypeScriptのソースから、export されたクラス・関数・メソッド・型・引数・戻り値・JSDocコメントをドキュメント化する定番ツール。	HTML / Markdown / JSON	"npm i -D typedoc typedoc-plugin-markdown
+npx typedoc --entryPointStrategy expand src/services src/utils"	クラス→メソッド→引数/戻り値の階層が自動で揃う。JSON出力を加工すればExcel化も可能。	処理内容の説明はJSDocに書かれた分しか出ない。export されていないものは既定で対象外。
+2	各ページの使用コンポーネント	react-scanner	JSXを解析し、どのファイルでどのコンポーネントが何回使われているかをJSONで出力。	JSON	"npm i -D react-scanner
+npx react-scanner -c react-scanner.config.js"	ページ×コンポーネント対応表をそのまま作れる。	JSON→表への変換は簡単なスクリプトが必要。
+3	ページ／コンポーネントの依存関係	dependency-cruiser	import 関係を解析し、依存グラフ・一覧を出力。ルール違反（層違反）チェックも可能。	HTML / DOT(SVG) / Mermaid / JSON / CSV	"npm i -D dependency-cruiser
+npx depcruise src --output-type mermaid"	依存図を設計書に貼れる。アーキテクチャルールの継続チェックにも使える。	import 単位なので「JSXで使用しているか」までは区別しない。
+4	依存関係（簡易）	Madge	依存グラフの画像出力や循環参照の検出。	画像 / JSON	npx madge --image graph.svg src	手軽。	設定の柔軟性は dependency-cruiser に劣る。
+5	コンポーネントProps一覧（Excel化）	react-docgen（CLI）	Storybookの内部でも使われるProps抽出エンジンを単体で実行。	JSON	npx react-docgen src/components --out docgen.json	Storybookなしでも Props一覧を表形式に変換できる。	表示UIはない。
+6	全項目をExcel設計書として出力	自作スクリプト（ts-morph 等でAST解析）	ページ・コンポーネント・クラス・メソッド・JSDoc・使用コンポーネントを抽出し、指定フォーマットのExcelへ直接出力。	Excel（任意）	"npm i -D ts-morph exceljs
+node scripts/gen-design-doc.js"	既存の設計書テンプレートに合わせられる。CIで再生成可能。	初期開発コストあり（目安：数日〜）。保守が必要。
+7	ページ・メソッドの処理概要（文章）	生成AI（Claude Code 等）	ソースを読ませて「処理概要」「処理フロー」「Mermaid図」を下書き生成し、人がレビューして確定。	Markdown / Excel 等	設計書テンプレートとソースを渡して章ごとに生成	内部ロジックの説明という最も手間な部分を大幅に省力化できる。	誤りが混入しうるためレビュー必須。社内・顧客のAI利用ルール（ソース持ち出し可否）の確認が必要。
+
+推奨構成（案）
+#	設計書の章	主ツール	作り方
+1	画面一覧（URL付き）	自作スクリプト or 手作業	ルーティング定義（react-router の routes 等）から抽出
+2	画面ごとの使用コンポーネント	react-scanner	JSON出力をページ単位に集計して表にする
+3	画面の処理概要	生成AI＋レビュー	ページのソースから処理概要を下書き生成
+4	コンポーネント一覧・仕様	Storybook（Autodocs）	Web閲覧用。Excelが必要なら react-docgen のJSONを表に変換
+5	Service/Util クラス・メソッド一覧／詳細	TypeDoc	JSDocを整備し、Markdown/HTML出力。Excelが必要ならJSON出力を変換
+6	依存関係図	dependency-cruiser	Mermaid/SVGで出力して設計書に添付
+
+進め方の提案
+① 設計書の最終形式（Web閲覧で良いか／Excel納品が必須か）を依頼元に確認する。形式によって最適解が大きく変わる。
+② 小規模なPoCとして、代表的な1画面とそのService/Utilに対し Storybook＋TypeDoc＋react-scanner を適用し、成果物サンプルと作業工数を測る。
+③ Excel納品が必須の場合は、上記ツールのJSON出力を集約してExcelを生成するスクリプトを作成し、CIで自動再生成できる形を目指す。

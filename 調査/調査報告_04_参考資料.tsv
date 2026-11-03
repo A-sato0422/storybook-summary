@@ -1,0 +1,11 @@
+﻿参考資料
+
+#	資料	URL
+1	Storybook公式：Install Storybook（導入手順・プロジェクト要件）	https://storybook.js.org/docs/get-started/install
+2	Storybook公式：Autodocs	https://storybook.js.org/docs/writing-docs/autodocs
+3	Storybook公式：Tags	https://storybook.js.org/docs/writing-stories/tags
+4	Storybook Docs for React（react-docgen と react-docgen-typescript の比較）	https://github.com/storybookjs/storybook/tree/next/code/addons/docs
+5	Storybook 10.4 リリース概要（AI自動セットアップ等）	https://alternativeto.net/news/2026/5/storybook-10-4-brings-ai-auto-setup-change-detection-quick-sharing-and-tanstack-react/
+6	Storybook 10.3 リリース概要（React向けMCP等）	https://alternativeto.net/news/2026/4/storybook-10-3-brings-mcp-for-react-accessibility-upgrades-and-expanded-csf-factories
+
+※ バージョン情報は2026年11月3日時点の調査に基づく。
